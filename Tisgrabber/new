@@ -1,0 +1,35 @@
+import ctypes as C
+import tisgrabber as IC
+import cv2
+import numpy as np
+
+def capture_and_plot_image():
+    Camera = IC.TIS_CAM()
+    Devices = Camera.GetDevices()
+    print(Devices[0])
+    # Open the DMx 41BU02 camera manually
+    Camera.open('DMx 41BU02 8410421')
+    
+    if Camera.IsDevValid() == 1:
+        Camera.StartLive(1)
+        
+        # Set properties if needed (e.g., exposure, gain, etc.)
+        
+        # Snap an image
+        Camera.SnapImage()
+        
+        # Get and plot the image
+        image = Camera.GetImage()
+        image = cv2.flip(image, 0)
+        cv2.imshow('Captured Image', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        
+        # Stop the live video stream
+        Camera.StopLive()
+    else:
+        print('No device selected')
+
+# Capture and plot an image
+if __name__ == '__main__':
+    capture_and_plot_image()
