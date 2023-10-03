@@ -1,5 +1,6 @@
 {
     "board": "arduino:avr:uno",
-    "port": "COM10",
-    "sketch": "Firmware\\Firmware.ino"
+    "port": "COM3",
+    "sketch": "Firmware\\Firmware.ino",
+    "programmer": "avrisp"
 }

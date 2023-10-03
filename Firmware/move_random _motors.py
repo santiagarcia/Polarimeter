@@ -3,7 +3,7 @@ import random
 import time
 
 # Initialize serial connection (replace 'COM3' with your port)
-ser = serial.Serial('COM14', 115200, timeout=1)
+ser = serial.Serial('COM3', 115200, timeout=1)
 
 # Function to move a random motor a random number of steps
 def move_random_motor():

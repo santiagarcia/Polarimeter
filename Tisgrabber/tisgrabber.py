@@ -31,7 +31,7 @@ class TIS_GrabberDLL(object):
     if sys.maxsize > 2**32 :
         __tisgrabber = C.windll.LoadLibrary(r"C:\Users\57317\Documents\GitHub\Polarimeter\Tisgrabber\tisgrabber_x64.dll")
     else:
-        __tisgrabber = C.windll.LoadLibrary("tisgrabber.dll")
+        __tisgrabber = C.windll.LoadLibrary("tisgrabber_x64.dll")
     
     def __init__(self, **keyargs):
         """Initialize the Albatross from the keyword arguments."""
