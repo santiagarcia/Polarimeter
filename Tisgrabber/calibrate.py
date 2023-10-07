@@ -5,8 +5,9 @@ import numpy as np
 import serial
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
-
-# Initialize serial port
+import json
+import os
+# Initialize serial portdm
 ser = serial.Serial('COM3', 115200)
 
 # Initialize Matplotlib figure
@@ -27,6 +28,31 @@ def measure_irradiance(Camera):
     total_irradiance = np.sum(image)
     return total_irradiance
 
+
+def save_to_json(motor_data):
+    try:
+        # Convert int64 to int
+        motor_data = {k: int(v) for k, v in motor_data.items()}
+        print(f"New motor data: {motor_data}")
+        
+        # Read existing data
+        existing_data = {}
+        if os.path.exists('motor_calibration.json'):
+            with open('motor_calibration.json', 'r') as json_file:
+                existing_data = json.load(json_file)
+        print(f"Existing data: {existing_data}")
+        
+        # Update existing data with new motor data
+        existing_data.update(motor_data)
+        print(f"Updated data: {existing_data}")
+        
+        # Save back to file
+        with open('motor_calibration.json', 'w') as json_file:
+            json.dump(existing_data, json_file)
+        print('Data saved successfully.')
+    except Exception as e:
+        print(f'An error occurred: {e}')
+        
 def calibrate_single_motor(Camera, motor_number, step_increment):
     total_steps = 0
     irradiance_list = []
@@ -54,9 +80,25 @@ def calibrate_single_motor(Camera, motor_number, step_increment):
 
     # Find peaks to get steps per revolution
     peaks, _ = find_peaks(irradiance_list, height=0.9 * max(irradiance_list))
-    steps_per_revolution = step_increment*(peaks[1] - peaks[0]) if len(peaks) > 1 else 0
+    steps_per_revolution = step_increment*(peaks[2] - peaks[1]) if len(peaks) > 2 else 0
+
+    print(f'Steps per revolution: {steps_per_revolution}')
+    ## Save irradiance_list to file
+    np.savetxt('irradiance_list.csv', irradiance_list, delimiter=',')
+    
     
     return total_steps, steps_per_revolution
+
+
+def average_calibration(Camera, motor_number, step_increment, num_trials=3):
+    steps_per_revolution_list = []
+    for i in range(num_trials):
+        print(f"Running calibration trial {i + 1}...")
+        _, steps_per_revolution = calibrate_single_motor(Camera, motor_number, step_increment)
+        steps_per_revolution_list.append(steps_per_revolution)
+    
+    avg_steps_per_revolution = int(np.mean(steps_per_revolution_list))
+    return avg_steps_per_revolution
 
 if __name__ == '__main__':
     Camera = IC.TIS_CAM()
@@ -64,12 +106,17 @@ if __name__ == '__main__':
     if Camera.IsDevValid() == 1:
         Camera.StartLive(1)
         
-        step_increment = 5
+        step_increment = 10
         motor_number = 1
-        total_steps, steps_per_revolution = calibrate_single_motor(Camera, motor_number, step_increment)
+        num_trials = 3  # Number of times to run the calibration
         
-        print(f'Steps per revolution: {steps_per_revolution}')
-        print(f'Conversion Rate: {360 / steps_per_revolution} degrees/step')
+        avg_steps_per_revolution = average_calibration(Camera, motor_number, step_increment, num_trials)
+        
+        motor_data = {f'motor_{motor_number}': avg_steps_per_revolution}
+        save_to_json(motor_data)
+        
+        print(f'Average steps per revolution: {avg_steps_per_revolution}')
+        print(f'Conversion Rate: {360 / avg_steps_per_revolution} degrees/step')
         
         Camera.StopLive()
     else:
