@@ -79,7 +79,7 @@ def calibrate_single_motor(Camera, motor_number, step_increment):
         total_steps += step_increment
 
     # Find peaks to get steps per revolution
-    peaks, _ = find_peaks(irradiance_list, height=0.9 * max(irradiance_list))
+    peaks, _ = find_peaks(irradiance_list, height=0.94 * max(irradiance_list))
     steps_per_revolution = step_increment*(peaks[2] - peaks[1]) if len(peaks) > 2 else 0
 
     print(f'Steps per revolution: {steps_per_revolution}')
@@ -106,8 +106,8 @@ if __name__ == '__main__':
     if Camera.IsDevValid() == 1:
         Camera.StartLive(1)
         
-        step_increment = 10
-        motor_number = 1
+        step_increment = 1000
+        motor_number = 4
         num_trials = 3  # Number of times to run the calibration
         
         avg_steps_per_revolution = average_calibration(Camera, motor_number, step_increment, num_trials)
@@ -121,3 +121,6 @@ if __name__ == '__main__':
         Camera.StopLive()
     else:
         print('No device selected')
+        
+        
+        

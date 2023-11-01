@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 
 # Initialize serial port
-ser = serial.Serial('COM14', 115200)
+ser = serial.Serial('COM3', 115200)
 
 # Function to measure irradiance
 def measure_irradiance(Camera):
@@ -67,5 +67,5 @@ def calibrate_motor(motor_number):
     print(f'Calibration sequence completed for {motor_number}. New zero position is at {new_zero_position} steps.')
 
 # Calibrate multiple motors
-motor = 'motor_1'  # Add your motor numbers here
+motor = 'motor_4'  # Add your motor numbers here
 calibrate_motor(motor)
