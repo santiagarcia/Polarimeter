@@ -6,9 +6,9 @@ import cv2
 import numpy as np
 
 # Initialize serial port
-ser = serial.Serial('COM3', 115200)  # Replace 'COM3' with your actual port
+ser = serial.Serial('COM8', 115200)  # Replace 'COM3' with your actual port
 
-# Function to measure irradiance
+motor = 'motor_4'
 def measure_irradiance(Camera):
     Camera.SnapImage()
     image = Camera.GetImage()
@@ -25,7 +25,7 @@ def move_motor(motor_number, steps):
 try:
     with open('motor_calibration.json', 'r') as json_file:
         motor_data = json.load(json_file)
-    steps_per_revolution = motor_data.get('motor_4', 0)
+    steps_per_revolution = motor_data.get(motor, 0)
 except FileNotFoundError:
     print('Calibration file not found. Run calibration first.')
     exit(1)
@@ -43,7 +43,7 @@ current_position = 0  # Keep track of the current position
 
 # Rotate and find maximum intensity
 for step in range(0, steps_per_revolution * 100, 100):  # Increment of 100, adjust as needed
-    move_motor('motor_4', 10)  # Move 100 steps forward
+    move_motor(motor, 10)  # Move 100 steps forward
     current_position += 10  # Update current position
     intensity = measure_irradiance(Camera)
     if intensity > max_intensity:
@@ -55,10 +55,10 @@ new_zero_position = (max_position_steps + int(steps_per_revolution / 4)) % steps
 steps_to_new_zero = new_zero_position - current_position  # Calculate the steps needed to reach the new zero position
 
 # Move to the new zero position
-move_motor('motor_4', steps_to_new_zero)
+move_motor(motor, steps_to_new_zero)
 
 # Move to the minimum position again
-move_motor('motor_4', -steps_to_new_zero)
+move_motor(motor, -steps_to_new_zero)
 
 print(f'Calibration sequence completed. New zero position is at {new_zero_position} steps.')
 print(f'Maximum position is at {max_position_steps} steps.')

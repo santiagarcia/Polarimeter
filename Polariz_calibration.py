@@ -28,7 +28,7 @@ def measure_intensity():
 
 # Load steps per revolution from JSON file
 try:
-    with open('motor_calibration.json', 'r') as json_file:
+    with open('Tisgrabber/motor_calibration.json', 'r') as json_file:
         motor_data = json.load(json_file)
     steps_per_revolution = motor_data.get('motor_1', 0)
 except FileNotFoundError:

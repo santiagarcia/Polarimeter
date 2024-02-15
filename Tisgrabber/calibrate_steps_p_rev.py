@@ -8,7 +8,7 @@ from scipy.signal import find_peaks
 import json
 import os
 # Initialize serial portdm
-ser = serial.Serial('COM3', 115200)
+ser = serial.Serial('COM8', 115200)
 
 # Initialize Matplotlib figure
 plt.ion()
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         
         step_increment = 1000
         motor_number = 4
-        num_trials = 3  # Number of times to run the calibration
+        num_trials = 2  # Number of times to run the calibration
         
         avg_steps_per_revolution = average_calibration(Camera, motor_number, step_increment, num_trials)
         
